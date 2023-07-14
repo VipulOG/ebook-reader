@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".ThemeBottomSheet">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
+        app:cardBackgroundColor="?attr/colorControlNormal"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="0dp" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/themes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:ignore="SpeakableTextPresentCheck"
+            tools:itemCount="4"
+            tools:listitem="@layout/theme_item" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/round_format_size_24"
+                tools:ignore="ContentDescription" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/fontSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:stepSize="2"
+                android:valueFrom="12"
+                android:valueTo="30"
+                app:haloColor="@android:color/transparent"
+                app:labelBehavior="gone"
+                app:thumbElevation="0dp"
+                app:tickVisible="false"
+                app:trackHeight="42dp"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintBounds" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/round_format_line_spacing_24"
+                tools:ignore="ContentDescription" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/lineHeight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:stepSize="2"
+                android:valueFrom="20"
+                android:valueTo="40"
+                app:haloColor="@android:color/transparent"
+                app:labelBehavior="gone"
+                app:thumbElevation="0dp"
+                app:tickVisible="false"
+                app:trackHeight="42dp"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintBounds" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/paragraph_spacing_24dp"
+                tools:ignore="ContentDescription" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/paragraphSpacing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:stepSize="5"
+                android:valueFrom="0"
+                android:valueTo="50"
+                app:haloColor="@android:color/transparent"
+                app:labelBehavior="gone"
+                app:thumbElevation="0dp"
+                app:tickVisible="false"
+                app:trackHeight="42dp"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintBounds" />
+        </LinearLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/justify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Justify"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/hyphenate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hyphenate"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/paginate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Paginated Flow"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
