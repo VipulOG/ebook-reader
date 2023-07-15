@@ -32,8 +32,6 @@ data class Book(
     val subject: List<String>? = null,
     val rights: String? = null,
     val toc: List<TocItem>,
-    val tocFraction: List<Float>,
-    val theme: ReaderTheme,
 )
 
 
