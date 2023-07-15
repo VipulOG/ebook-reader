@@ -22,42 +22,6 @@ import java.io.File
 import java.io.FileOutputStream
 
 
-val lightTheme = ReaderTheme(
-    name = "light",
-    backgroundColor = Color.WHITE,
-    textColor = Color.BLACK,
-    fontSize = 16f,
-    lineHeight = 20f,
-    paragraphSpacing = 1.5f,
-    justify = true,
-    hyphenate = true
-)
-
-
-val darkTheme = ReaderTheme(
-    name = "dark",
-    backgroundColor = Color.BLACK,
-    textColor = Color.WHITE,
-    fontSize = 16f,
-    lineHeight = 20f,
-    paragraphSpacing = 1.5f,
-    justify = true,
-    hyphenate = true
-)
-
-
-val sepiaTheme = ReaderTheme(
-    name = "sepia",
-    backgroundColor = Color.parseColor("#F4EFE0"),
-    textColor = Color.parseColor("#4D4433"),
-    fontSize = 16f,
-    lineHeight = 20f,
-    paragraphSpacing = 1.5f,
-    justify = true,
-    hyphenate = true
-)
-
-
 class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode.Callback {
     private lateinit var binding: ActivityReaderBinding
     private var actionMode: ActionMode? = null
@@ -71,6 +35,39 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         add(darkTheme)
         add(sepiaTheme)
     }
+
+    val lightTheme = ReaderTheme(
+        name = "light",
+        backgroundColor = Color.WHITE,
+        textColor = Color.BLACK,
+        fontSize = 16f,
+        lineHeight = 20f,
+        paragraphSpacing = 1.5f,
+        justify = true,
+        hyphenate = true
+    )
+
+    val darkTheme = ReaderTheme(
+        name = "dark",
+        backgroundColor = Color.BLACK,
+        textColor = Color.WHITE,
+        fontSize = 16f,
+        lineHeight = 20f,
+        paragraphSpacing = 1.5f,
+        justify = true,
+        hyphenate = true
+    )
+
+    val sepiaTheme = ReaderTheme(
+        name = "sepia",
+        backgroundColor = Color.parseColor("#F4EFE0"),
+        textColor = Color.parseColor("#4D4433"),
+        fontSize = 16f,
+        lineHeight = 20f,
+        paragraphSpacing = 1.5f,
+        justify = true,
+        hyphenate = true
+    )
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
