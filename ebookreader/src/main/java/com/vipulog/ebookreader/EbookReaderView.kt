@@ -113,6 +113,11 @@ class EbookReaderView : WebView {
     }
 
 
+    fun goToFraction(fraction: Float) {
+        processJavascript("goToFraction($fraction)")
+    }
+
+
     fun next() {
         processJavascript("next()")
     }
