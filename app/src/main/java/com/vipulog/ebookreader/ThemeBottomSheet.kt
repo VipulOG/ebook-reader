@@ -18,12 +18,10 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
     private lateinit var listener: ThemeChangeListener
     private lateinit var themes: List<ReaderTheme>
     private lateinit var currentTheme: ReaderTheme
-    private lateinit var flow: String
 
 
     interface ThemeChangeListener {
         fun onThemeChange(newTheme: ReaderTheme)
-        fun onFlowChange(newFlow: String)
     }
 
 
@@ -53,30 +51,6 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
 
     private fun setupThemeSettings() {
         with(binding) {
-            fontSize.apply {
-                value = roundToStep(currentTheme.fontSize, valueFrom, valueTo, stepSize)
-                addOnChangeListener { _, value, _ ->
-                    currentTheme.fontSize = value
-                    listener.onThemeChange(currentTheme)
-                }
-            }
-
-            paragraphSpacing.apply {
-                value = roundToStep(currentTheme.paragraphSpacing, valueFrom, valueTo, stepSize)
-                addOnChangeListener { _, value, _ ->
-                    currentTheme.paragraphSpacing = value
-                    listener.onThemeChange(currentTheme)
-                }
-            }
-
-            lineHeight.apply {
-                value = roundToStep(currentTheme.lineHeight, valueFrom, valueTo, stepSize)
-                addOnChangeListener { _, value, _ ->
-                    currentTheme.lineHeight = value
-                    listener.onThemeChange(currentTheme)
-                }
-            }
-
             justify.apply {
                 isChecked = currentTheme.justify
                 setOnCheckedChangeListener { _, isChecked ->
@@ -94,9 +68,10 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
             }
 
             paginate.apply {
-                isChecked = flow == "paginated"
+                isChecked = currentTheme.flow == ReaderFlow.PAGINATED
                 setOnCheckedChangeListener { _, isChecked ->
-                    listener.onFlowChange(if (isChecked) "paginated" else "scrolled")
+                    currentTheme.flow = if (isChecked) ReaderFlow.PAGINATED else ReaderFlow.SCROLLED
+                    listener.onThemeChange(currentTheme)
                 }
             }
         }
@@ -108,16 +83,20 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
         @SuppressLint("NotifyDataSetChanged")
         fun bind(themeItem: ReaderTheme) {
             val isSelected = themeItem == currentTheme
+            val isDark = themeItem.isDark
+            val bg = if (isDark) themeItem.darkBg else themeItem.lightBg
+            val fg = if (isDark) themeItem.darkFg else themeItem.lightFg
+
             with(itemBinding) {
                 circleView.apply {
-                    borderColor = themeItem.textColor
+                    borderColor = fg
 
                     shadowRadius = if (isSelected) 4f else 2f
-                    shadowColor = if (isSelected) themeItem.textColor else themeItem.backgroundColor
+                    shadowColor = if (isSelected) fg else bg
 
-                    circleColor = when (themeItem.backgroundColor) {
-                        0 -> if (themeItem.textColor == Color.WHITE) Color.BLACK else Color.WHITE
-                        else -> themeItem.backgroundColor
+                    circleColor = when (bg) {
+                        0 -> if (fg == Color.WHITE) Color.BLACK else Color.WHITE
+                        else -> bg
                     }
 
                     setOnClickListener {
@@ -129,7 +108,7 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
 
                 selectionMark.apply {
                     visibility = if (isSelected) View.VISIBLE else View.GONE
-                    setColorFilter(themeItem.textColor)
+                    setColorFilter(fg)
                 }
             }
         }
@@ -167,13 +146,11 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
         fun newInstance(
             themes: List<ReaderTheme>,
             currentTheme: ReaderTheme,
-            flow: String,
             listener: ThemeChangeListener
         ): ThemeBottomSheet {
             return ThemeBottomSheet().apply {
                 this.themes = themes
                 this.currentTheme = currentTheme
-                this.flow = flow
                 this.listener = listener
             }
         }

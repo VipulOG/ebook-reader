@@ -98,29 +98,18 @@ class EbookReaderView : WebView {
     }
 
 
-    fun getTheme(callback: (ReaderTheme) -> Unit) {
-        processJavascript("getTheme()") {
+    fun getAppearance(callback: (ReaderTheme) -> Unit) {
+        processJavascript("getAppearance()") {
             callback(Json.decodeFromString(it))
         }
     }
 
 
-    fun setTheme(theme: ReaderTheme) {
-        val themeJson = Json.encodeToString(theme)
-        processJavascript("setTheme($themeJson)")
-    }
 
-
-    fun getFlow(callback: (String?) -> Unit) {
-        processJavascript("getFlow()") {
-            if (it == "null") callback(null)
-            else callback(it)
-        }
-    }
-
-
-    fun setFlow(flow: String) {
-        processJavascript("setFlow('$flow')")
+    fun setAppearance(theme: ReaderTheme) {
+        val json = Json { encodeDefaults = true }
+        val themeJson = json.encodeToString(theme)
+        processJavascript("setAppearance($themeJson)")
     }
 
 

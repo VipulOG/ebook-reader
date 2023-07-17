@@ -14,7 +14,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 @Serializable
-data class Book(
+data class BookMetaData(
     val title: String? = null,
     val subtitle: String? = null,
     @Serializable(with = NameSerializer::class)
@@ -32,24 +32,23 @@ data class Book(
     val subject: List<String>? = null,
     val rights: String? = null,
     val toc: List<TocItem>,
-)
+) {
+    private object NameSerializer : KSerializer<List<String>> {
+        override val descriptor: SerialDescriptor =
+            PrimitiveSerialDescriptor("NameSerializer", PrimitiveKind.STRING)
 
+        override fun serialize(encoder: Encoder, value: List<String>) {
+            val jsonArray = JsonArray(value.map { fullName ->
+                buildJsonObject { put("name", fullName) }
+            })
+            encoder.encodeSerializableValue(JsonArray.serializer(), jsonArray)
+        }
 
-internal object NameSerializer : KSerializer<List<String>> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("NameSerializer", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: List<String>) {
-        val jsonArray = JsonArray(value.map { fullName ->
-            buildJsonObject { put("name", fullName) }
-        })
-        encoder.encodeSerializableValue(JsonArray.serializer(), jsonArray)
-    }
-
-    override fun deserialize(decoder: Decoder): List<String> {
-        val jsonArray = decoder.decodeSerializableValue(JsonArray.serializer())
-        return jsonArray.map { jsonObject ->
-            jsonObject.jsonObject["name"]?.jsonPrimitive?.content ?: ""
+        override fun deserialize(decoder: Decoder): List<String> {
+            val jsonArray = decoder.decodeSerializableValue(JsonArray.serializer())
+            return jsonArray.map { jsonObject ->
+                jsonObject.jsonObject["name"]?.jsonPrimitive?.content ?: ""
+            }
         }
     }
 }

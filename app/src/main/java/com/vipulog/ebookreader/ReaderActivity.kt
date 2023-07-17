@@ -22,6 +22,37 @@ import java.io.File
 import java.io.FileOutputStream
 
 
+private val lightTheme = ReaderTheme(
+    name = "light",
+    lightBg = Color.WHITE,
+    lightFg = Color.BLACK,
+    darkBg = Color.WHITE,
+    darkFg = Color.BLACK,
+    isDark = false,
+)
+
+
+private val darkTheme = ReaderTheme(
+    name = "dark",
+    lightBg = Color.BLACK,
+    lightFg = Color.WHITE,
+    darkBg = Color.BLACK,
+    darkFg = Color.WHITE,
+    isDark = true,
+)
+
+
+private val sepiaTheme = ReaderTheme(
+    name = "sepia",
+    lightBg = Color.parseColor("#f1e8d0"),
+    lightFg = Color.parseColor("#5b4636"),
+    darkBg = Color.parseColor("#342e25"),
+    darkFg = Color.parseColor("#ffd595"),
+    lightLink = Color.parseColor("#008b8b"),
+    darkLink = Color.parseColor("#48d1cc"),
+)
+
+
 class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode.Callback {
     private lateinit var binding: ActivityReaderBinding
     private var actionMode: ActionMode? = null
@@ -36,39 +67,6 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         add(sepiaTheme)
     }
 
-    val lightTheme = ReaderTheme(
-        name = "light",
-        backgroundColor = Color.WHITE,
-        textColor = Color.BLACK,
-        fontSize = 16f,
-        lineHeight = 20f,
-        paragraphSpacing = 1.5f,
-        justify = true,
-        hyphenate = true
-    )
-
-    val darkTheme = ReaderTheme(
-        name = "dark",
-        backgroundColor = Color.BLACK,
-        textColor = Color.WHITE,
-        fontSize = 16f,
-        lineHeight = 20f,
-        paragraphSpacing = 1.5f,
-        justify = true,
-        hyphenate = true
-    )
-
-    val sepiaTheme = ReaderTheme(
-        name = "sepia",
-        backgroundColor = Color.parseColor("#F4EFE0"),
-        textColor = Color.parseColor("#4D4433"),
-        fontSize = 16f,
-        lineHeight = 20f,
-        paragraphSpacing = 1.5f,
-        justify = true,
-        hyphenate = true
-    )
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +76,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         openBook()
         setupUI()
     }
+
 
     private fun setupUI() {
         binding.appBar.menu.setGroupVisible(R.id.bookOptions, false)
@@ -106,22 +105,14 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
                 R.id.theme -> {
                     val listener = object : ThemeBottomSheet.ThemeChangeListener {
                         override fun onThemeChange(newTheme: ReaderTheme) {
-                            binding.ebookReader.setTheme(newTheme)
-                        }
-
-                        override fun onFlowChange(newFlow: String) {
+                            binding.ebookReader.setAppearance(newTheme)
                             binding.navBtnContainer.visibility =
-                                if (newFlow == "paginated") GONE else VISIBLE
-                            binding.ebookReader.setFlow(newFlow)
+                                if (newTheme.flow == ReaderFlow.PAGINATED) GONE else VISIBLE
                         }
                     }
-                    binding.ebookReader.getTheme { theme ->
-                        binding.ebookReader.getFlow {
-                            val flow = it ?: "paginated"
-                            val themeSheet =
-                                ThemeBottomSheet.newInstance(themes, theme, flow, listener)
-                            themeSheet.show(supportFragmentManager, ThemeBottomSheet.TAG)
-                        }
+                    binding.ebookReader.getAppearance {
+                        val themeSheet = ThemeBottomSheet.newInstance(themes, it, listener)
+                        themeSheet.show(supportFragmentManager, ThemeBottomSheet.TAG)
                     }
                     true
                 }
@@ -132,16 +123,16 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     }
 
 
-    override fun onBookLoaded(book: Book) {
+    override fun onBookLoaded(bookMetaData: BookMetaData) {
         binding.loading.visibility = GONE
-        binding.appBar.subtitle = book.subtitle ?: book.title
+        binding.appBar.subtitle = bookMetaData.subtitle ?: bookMetaData.title
         binding.appBar.menu.setGroupVisible(R.id.bookOptions, true)
 
-        binding.ebookReader.getTheme {
+        binding.ebookReader.getAppearance {
             themes.add(0, it)
         }
 
-        tocSheet = TocBottomSheet.newInstance(book.toc, currentTocItem, object :
+        tocSheet = TocBottomSheet.newInstance(bookMetaData.toc, currentTocItem, object :
             TocBottomSheet.TocItemClickListener {
             override fun onItemClick(tocItem: TocItem) {
                 binding.ebookReader.goto(tocItem.href)

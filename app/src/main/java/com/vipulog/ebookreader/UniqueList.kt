@@ -2,14 +2,18 @@ package com.vipulog.ebookreader
 
 class UniqueList<T> : ArrayList<T>() {
     override fun add(element: T): Boolean {
-        if (!contains(element)) {
-            return super.add(element)
+        val index = indexOfFirst { it == element }
+        if (index != -1) {
+            set(index, element)
+            return true
         }
-        return false
+        return super.add(element)
     }
 
     override fun add(index: Int, element: T) {
-        if (!contains(element)) {
+        if (get(index) == element) {
+            set(index, element)
+        } else {
             super.add(index, element)
         }
     }
