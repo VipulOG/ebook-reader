@@ -73,7 +73,6 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         binding = ActivityReaderBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        openBook()
         setupUI()
     }
 
@@ -90,6 +89,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
 
 
     private fun setupOptions() {
+        scope.launch { binding.ebookReader.openBook(intent.data!!) }
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.toc -> {
@@ -200,35 +200,6 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
             }
 
             else -> false
-        }
-    }
-
-
-    private fun openBook() {
-        scope.launch {
-            val fileUri = requireNotNull(intent.data)
-            val fileName = "book.epub"
-            val outputFile = File("$cacheDir/epubreader", fileName)
-            copy(outputFile, fileUri)
-            binding.ebookReader.openBook(outputFile.toURI().toString())
-        }
-    }
-
-
-    private suspend fun copy(outputFile: File, fileUri: Uri) {
-        withContext(Dispatchers.IO) {
-            if (!outputFile.exists()) outputFile.parentFile?.mkdirs()
-
-            contentResolver.openInputStream(fileUri)?.use { input ->
-                FileOutputStream(outputFile).use { output ->
-                    val buffer = ByteArray(1024)
-                    var read: Int
-                    while (input.read(buffer).also { read = it } != -1) {
-                        output.write(buffer, 0, read)
-                    }
-                    output.flush()
-                }
-            }
         }
     }
 

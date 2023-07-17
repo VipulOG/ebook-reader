@@ -29,6 +29,14 @@
             android:layout_height="wrap_content"
             android:text="Open File"
             tools:ignore="HardcodedText" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/openUrl"
+            android:enabled="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open Url"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

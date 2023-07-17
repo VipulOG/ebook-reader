@@ -12,11 +12,15 @@ import android.webkit.WebView
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
+import java.io.FileOutputStream
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -74,12 +78,33 @@ class EbookReaderView : WebView {
     }
 
 
-    fun openBook(path: String) {
+    suspend fun openBook(uri: Uri) {
+        val isOffline = uri.scheme == "content"
+        var url = uri.toString()
+
+        if (isOffline) withContext(IO) {
+            val fileName = "book.epub"
+            val outputFile = File("${context.cacheDir}/epubreader", fileName)
+            url = outputFile.toURI().toString()
+
+            if (!outputFile.exists()) outputFile.parentFile?.mkdirs()
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(outputFile).use { output ->
+                    val buffer = ByteArray(1024)
+                    var read: Int
+                    while (input.read(buffer).also { read = it } != -1) {
+                        output.write(buffer, 0, read)
+                    }
+                    output.flush()
+                }
+            }
+        }
+
         val readerUrl = "https://appassets.androidplatform.net/assets/ebook-reader/reader.html"
-        val bookUrl = "http://localhost:8080/?url=$path"
+        val bookUrl = if (isOffline) "http://localhost:8080/?url=$url" else url
         val uriBuilder = Uri.parse(readerUrl).buildUpon().appendQueryParameter("url", bookUrl)
-        val url = uriBuilder.build().toString()
-        loadUrl(url)
+        val bookReaderUrl = uriBuilder.build().toString()
+        loadUrl(bookReaderUrl)
     }
 
 
@@ -103,7 +128,6 @@ class EbookReaderView : WebView {
             callback(Json.decodeFromString(it))
         }
     }
-
 
 
     fun setAppearance(theme: ReaderTheme) {
