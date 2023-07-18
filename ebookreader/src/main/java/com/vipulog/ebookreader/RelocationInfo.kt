@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class RelocationInfo(
-    val fraction: Float,
+    val fraction: Double,
     val tocItem: TocItem? = null,
 )
