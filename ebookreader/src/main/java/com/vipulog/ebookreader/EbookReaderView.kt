@@ -84,7 +84,7 @@ class EbookReaderView : WebView {
 
         if (isOffline) withContext(IO) {
             val fileName = "book.epub"
-            val outputFile = File("${context.cacheDir}/epubreader", fileName)
+            val outputFile = File("${context.cacheDir}/ebookreader", fileName)
             url = outputFile.toURI().toString()
 
             if (!outputFile.exists()) outputFile.parentFile?.mkdirs()
