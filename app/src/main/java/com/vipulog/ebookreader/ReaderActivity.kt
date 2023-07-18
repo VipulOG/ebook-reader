@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -15,11 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import com.vipulog.ebookreader.databinding.ActivityReaderBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
 
 
 private val lightTheme = ReaderTheme(
@@ -28,7 +23,7 @@ private val lightTheme = ReaderTheme(
     lightFg = Color.BLACK,
     darkBg = Color.WHITE,
     darkFg = Color.BLACK,
-    isDark = false,
+    useDark = false,
 )
 
 
@@ -38,7 +33,7 @@ private val darkTheme = ReaderTheme(
     lightFg = Color.WHITE,
     darkBg = Color.BLACK,
     darkFg = Color.WHITE,
-    isDark = true,
+    useDark = true,
 )
 
 

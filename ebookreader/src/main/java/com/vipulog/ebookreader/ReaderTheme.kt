@@ -13,23 +13,23 @@ data class ReaderTheme(
     @SerialName("themeName")
     val name: String,
     @Serializable(with = ColorSerializer::class)
-    var lightBg: Int = Color.WHITE,
+    var lightBg: Int = Color.parseColor("#ffffff"),
     @Serializable(with = ColorSerializer::class)
-    var lightFg: Int = Color.BLACK,
+    var lightFg: Int = Color.parseColor("#000000"),
     @Serializable(with = ColorSerializer::class)
-    var lightLink: Int = Color.BLUE,
+    var lightLink: Int = Color.parseColor("#0066cc"),
     @Serializable(with = ColorSerializer::class)
-    var darkBg: Int = Color.BLACK,
+    var darkBg: Int = Color.parseColor("#222222"),
     @Serializable(with = ColorSerializer::class)
-    var darkFg: Int = Color.WHITE,
+    var darkFg: Int = Color.parseColor("#e0e0e0"),
     @Serializable(with = ColorSerializer::class)
-    var darkLink: Int = Color.CYAN,
+    var darkLink: Int = Color.parseColor("#88ccee"),
     var gap: Float = 0.06f,
     var maxInlineSize: Int = 720,
     var maxBlockSize: Int = 1440,
     var maxColumnCount: Int = 2,
     var flow: ReaderFlow = ReaderFlow.PAGINATED,
-    var isDark: Boolean = false,
+    var useDark: Boolean = false,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

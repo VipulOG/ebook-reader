@@ -83,7 +83,7 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
         @SuppressLint("NotifyDataSetChanged")
         fun bind(themeItem: ReaderTheme) {
             val isSelected = themeItem == currentTheme
-            val isDark = themeItem.isDark
+            val isDark = themeItem.useDark
             val bg = if (isDark) themeItem.darkBg else themeItem.lightBg
             val fg = if (isDark) themeItem.darkFg else themeItem.lightFg
 
