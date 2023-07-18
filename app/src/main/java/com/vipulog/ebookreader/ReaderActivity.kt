@@ -148,9 +148,9 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     }
 
 
-    override fun onProgressChanged(progress: Int, currentTocItem: TocItem?) {
+    override fun onProgressChanged(progress: Float, currentTocItem: TocItem?) {
         this.currentTocItem = currentTocItem
-        binding.progressBar.progress = progress
+        binding.progressBar.progress = (progress * 100).toInt()
         binding.appBar.title = currentTocItem?.label ?: ""
     }
 

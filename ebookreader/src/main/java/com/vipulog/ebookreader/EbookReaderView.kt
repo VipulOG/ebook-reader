@@ -174,8 +174,8 @@ class EbookReaderView : WebView {
             scope.launch {
                 val relocationInfo: RelocationInfo = json.decodeFromString(relocationInfoJson)
                 val currentTocItem = relocationInfo.tocItem
-                val progress = (relocationInfo.fraction * 100).toInt()
-                listener?.onProgressChanged(progress, currentTocItem)
+                val fraction = relocationInfo.fraction
+                listener?.onProgressChanged(fraction, currentTocItem)
             }
         }
 
