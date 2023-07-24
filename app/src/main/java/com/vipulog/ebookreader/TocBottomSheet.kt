@@ -13,14 +13,7 @@ import com.vipulog.ebookreader.databinding.TocItemBinding
 
 class TocBottomSheet : BottomSheetDialogFragment() {
     private lateinit var binding: TocBottomSheetBinding
-    private lateinit var listener: TocItemClickListener
-    private lateinit var toc: List<TocItem>
-    private var currentTocItem: TocItem? = null
-
-
-    interface TocItemClickListener {
-        fun onItemClick(tocItem: TocItem)
-    }
+    private lateinit var activity: ReaderActivity
 
 
     override fun onCreateView(
@@ -34,6 +27,12 @@ class TocBottomSheet : BottomSheetDialogFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        activity = requireActivity() as ReaderActivity
+        setupRecyclerView()
+    }
+
+
+    private fun setupRecyclerView() {
         binding.list.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = ItemAdapter()
@@ -41,11 +40,23 @@ class TocBottomSheet : BottomSheetDialogFragment() {
     }
 
 
-    private inner class ViewHolder(binding: TocItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        val tocItem = binding.tocItem
-        val textView = binding.textView
-        val selectionBg = binding.selectionBg
+    private inner class ViewHolder(itemBinding: TocItemBinding) :
+        RecyclerView.ViewHolder(itemBinding.root) {
+        val item = itemBinding.item
+        val textView = itemBinding.textView
+        val selectionBg = itemBinding.selectionBg
+
+        fun bind(tocItem: TocItem) {
+            selectionBg.visibility =
+                if (tocItem == activity.currentTocItem) View.VISIBLE else View.GONE
+            item.isEnabled = tocItem != activity.currentTocItem
+            textView.text = tocItem.label?.trim()
+
+            item.setOnClickListener {
+                activity.gotoTocItem(tocItem)
+                dismiss()
+            }
+        }
     }
 
 
@@ -57,37 +68,17 @@ class TocBottomSheet : BottomSheetDialogFragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val tocItem = toc[position]
-
-            with(holder) {
-                selectionBg.visibility = if (tocItem == currentTocItem) View.VISIBLE else View.GONE
-                this.tocItem.isEnabled = tocItem != currentTocItem
-                textView.text = tocItem.label?.trim()
-
-                this.tocItem.setOnClickListener {
-                    listener.onItemClick(tocItem)
-                    dismiss()
-                }
-            }
+            val tocItem = activity.toc[position]
+            holder.bind(tocItem)
         }
 
-        override fun getItemCount(): Int = toc.size
+        override fun getItemCount(): Int = activity.toc.size
     }
 
 
     companion object {
         const val TAG = "TocBottomSheet"
 
-        fun newInstance(
-            toc: List<TocItem>,
-            currentTocItem: TocItem?,
-            listener: TocItemClickListener
-        ): TocBottomSheet {
-            return TocBottomSheet().apply {
-                this.toc = toc
-                this.currentTocItem = currentTocItem
-                this.listener = listener
-            }
-        }
+        fun newInstance(): TocBottomSheet = TocBottomSheet()
     }
 }

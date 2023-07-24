@@ -55,8 +55,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     private var actionMode: ActionMode? = null
     private val scope = lifecycleScope
 
-    private lateinit var tocSheet: TocBottomSheet
-    private var currentTocItem: TocItem? = null
+    var currentTocItem: TocItem? = null
+    lateinit var toc: List<TocItem>
 
     lateinit var currentTheme: ReaderTheme
     val themes = UniqueList<ReaderTheme>().apply {
@@ -96,7 +96,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.toc -> {
-                    tocSheet.show(supportFragmentManager, TocBottomSheet.TAG)
+                    TocBottomSheet.newInstance().show(supportFragmentManager, TocBottomSheet.TAG)
                     true
                 }
 
@@ -106,8 +106,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
                 }
 
                 R.id.theme -> {
-                    val themeSheet = ThemeBottomSheet.newInstance()
-                    themeSheet.show(supportFragmentManager, ThemeBottomSheet.TAG)
+                    ThemeBottomSheet.newInstance().show(supportFragmentManager, ThemeBottomSheet.TAG)
                     true
                 }
 
@@ -124,17 +123,10 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
 
         binding.ebookReader.getAppearance {
             themes.add(0, it)
+            currentTheme = it
         }
 
-        binding.ebookReader.getAppearance { currentTheme = it }
-
-        tocSheet = TocBottomSheet.newInstance(bookMetaData.toc, currentTocItem, object :
-            TocBottomSheet.TocItemClickListener {
-            override fun onItemClick(tocItem: TocItem) {
-                binding.ebookReader.goto(tocItem.href)
-                tocSheet.dismiss()
-            }
-        })
+        toc = bookMetaData.toc
     }
 
 
@@ -207,6 +199,11 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         currentTheme.flow = flow
         binding.navBtnContainer.visibility = if (flow == ReaderFlow.PAGINATED) GONE else VISIBLE
         binding.ebookReader.setAppearance(currentTheme)
+    }
+
+
+    fun gotoTocItem(tocItem: TocItem) {
+        binding.ebookReader.goto(tocItem.href)
     }
 
 
