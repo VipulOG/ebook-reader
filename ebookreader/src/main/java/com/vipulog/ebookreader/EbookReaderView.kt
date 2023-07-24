@@ -101,7 +101,8 @@ class EbookReaderView : WebView {
         }
 
         val readerUrl = "https://appassets.androidplatform.net/assets/ebook-reader/reader.html"
-        val bookUrl = if (isOffline) "http://localhost:8080/?url=$url" else url
+        val bookUrl =
+            if (isOffline) "http://localhost:${fileServer.listeningPort}/?url=$url" else url
         val uriBuilder = Uri.parse(readerUrl).buildUpon().appendQueryParameter("url", bookUrl)
         val bookReaderUrl = uriBuilder.build().toString()
         loadUrl(bookReaderUrl)

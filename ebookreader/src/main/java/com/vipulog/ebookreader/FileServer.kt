@@ -6,9 +6,10 @@ import androidx.core.net.toFile
 import fi.iki.elonen.NanoHTTPD
 import java.io.FileInputStream
 import java.io.IOException
+import java.util.Random
 
 
-internal class FileServer(port: Int = 8080) : NanoHTTPD(port) {
+internal class FileServer(port: Int = findAvailablePort()) : NanoHTTPD(port) {
     init {
         start(SOCKET_READ_TIMEOUT, false)
     }
@@ -34,6 +35,37 @@ internal class FileServer(port: Int = 8080) : NanoHTTPD(port) {
                 MIME_PLAINTEXT,
                 "Error loading $fileUrl"
             )
+        }
+    }
+
+    companion object {
+        private const val MAX_RETRY = 5
+
+        private fun findAvailablePort(): Int {
+            val random = Random()
+            var retry = 0
+            var port: Int
+
+            do {
+                port = random.nextInt(16384) + 49152
+                retry++
+            } while (!isPortAvailable(port) && retry < MAX_RETRY)
+
+            if (!isPortAvailable(port)) {
+                throw RuntimeException("Couldn't find an available port after $MAX_RETRY retries.")
+            }
+
+            return port
+        }
+
+        private fun isPortAvailable(port: Int): Boolean {
+            return try {
+                val socket = java.net.ServerSocket(port)
+                socket.close()
+                true
+            } catch (e: Exception) {
+                false
+            }
         }
     }
 }
