@@ -164,8 +164,14 @@
             android:id="@+id/paginate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checked="true"
             android:text="Paginated Flow"
+            tools:ignore="HardcodedText,VisualLintButtonSize" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/useDark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Use Dark Theme"
             tools:ignore="HardcodedText,VisualLintButtonSize" />
 
     </LinearLayout>

@@ -17,23 +17,25 @@ import com.vipulog.ebookreader.databinding.ActivityReaderBinding
 import kotlinx.coroutines.launch
 
 
-private val lightTheme = ReaderTheme(
-    name = "light",
-    lightBg = Color.WHITE,
-    lightFg = Color.BLACK,
-    darkBg = Color.WHITE,
-    darkFg = Color.BLACK,
-    useDark = false,
+private val oceanicBreezeTheme = ReaderTheme(
+    name = "oceanicBreeze",
+    lightBg = Color.parseColor("#e6f9ff"),
+    lightFg = Color.parseColor("#2c3e50"),
+    darkBg = Color.parseColor("#34495e"),
+    darkFg = Color.parseColor("#ecf0f1"),
+    lightLink = Color.parseColor("#3498db"),
+    darkLink = Color.parseColor("#5dade2"),
 )
 
 
-private val darkTheme = ReaderTheme(
-    name = "dark",
-    lightBg = Color.BLACK,
-    lightFg = Color.WHITE,
-    darkBg = Color.BLACK,
-    darkFg = Color.WHITE,
-    useDark = true,
+private val enchantedForestTheme = ReaderTheme(
+    name = "enchantedForest",
+    lightBg = Color.parseColor("#f5f5f5"),
+    lightFg = Color.parseColor("#303030"),
+    darkBg = Color.parseColor("#1a1a1a"),
+    darkFg = Color.parseColor("#f5f5f5"),
+    lightLink = Color.parseColor("#8fbc8f"),
+    darkLink = Color.parseColor("#7cfc00"),
 )
 
 
@@ -56,11 +58,17 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     private lateinit var tocSheet: TocBottomSheet
     private var currentTocItem: TocItem? = null
 
-    private val themes = UniqueList<ReaderTheme>().apply {
-        add(lightTheme)
-        add(darkTheme)
+    lateinit var currentTheme: ReaderTheme
+    val themes = UniqueList<ReaderTheme>().apply {
+        add(oceanicBreezeTheme)
+        add(enchantedForestTheme)
         add(sepiaTheme)
     }
+
+    var flow = ReaderFlow.PAGINATED
+    var hyphenate = true
+    var justify = true
+    var useDark = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,17 +106,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
                 }
 
                 R.id.theme -> {
-                    val listener = object : ThemeBottomSheet.ThemeChangeListener {
-                        override fun onThemeChange(newTheme: ReaderTheme) {
-                            binding.ebookReader.setAppearance(newTheme)
-                            binding.navBtnContainer.visibility =
-                                if (newTheme.flow == ReaderFlow.PAGINATED) GONE else VISIBLE
-                        }
-                    }
-                    binding.ebookReader.getAppearance {
-                        val themeSheet = ThemeBottomSheet.newInstance(themes, it, listener)
-                        themeSheet.show(supportFragmentManager, ThemeBottomSheet.TAG)
-                    }
+                    val themeSheet = ThemeBottomSheet.newInstance()
+                    themeSheet.show(supportFragmentManager, ThemeBottomSheet.TAG)
                     true
                 }
 
@@ -126,6 +125,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         binding.ebookReader.getAppearance {
             themes.add(0, it)
         }
+
+        binding.ebookReader.getAppearance { currentTheme = it }
 
         tocSheet = TocBottomSheet.newInstance(bookMetaData.toc, currentTocItem, object :
             TocBottomSheet.TocItemClickListener {
@@ -196,6 +197,16 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
 
             else -> false
         }
+    }
+
+
+    fun applyTheme() {
+        currentTheme.useDark = useDark
+        currentTheme.hyphenate = hyphenate
+        currentTheme.justify = justify
+        currentTheme.flow = flow
+        binding.navBtnContainer.visibility = if (flow == ReaderFlow.PAGINATED) GONE else VISIBLE
+        binding.ebookReader.setAppearance(currentTheme)
     }
 
 

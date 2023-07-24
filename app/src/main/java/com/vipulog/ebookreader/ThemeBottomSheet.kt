@@ -11,18 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.vipulog.ebookreader.databinding.ThemeBottomSheetBinding
 import com.vipulog.ebookreader.databinding.ThemeItemBinding
-import kotlin.math.roundToInt
 
 class ThemeBottomSheet : BottomSheetDialogFragment() {
     private lateinit var binding: ThemeBottomSheetBinding
-    private lateinit var listener: ThemeChangeListener
-    private lateinit var themes: List<ReaderTheme>
-    private lateinit var currentTheme: ReaderTheme
-
-
-    interface ThemeChangeListener {
-        fun onThemeChange(newTheme: ReaderTheme)
-    }
+    private lateinit var activity: ReaderActivity
 
 
     override fun onCreateView(
@@ -36,8 +28,9 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupRecyclerView()
+        activity = requireActivity() as ReaderActivity
         setupThemeSettings()
+        setupRecyclerView()
     }
 
 
@@ -49,29 +42,37 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
     }
 
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun setupThemeSettings() {
         with(binding) {
             justify.apply {
-                isChecked = currentTheme.justify
-                setOnCheckedChangeListener { _, isChecked ->
-                    currentTheme.justify = isChecked
-                    listener.onThemeChange(currentTheme)
-                }
+                isChecked = activity.justify
+                setOnCheckedChangeListener { _, isChecked -> activity.justify = isChecked }
+                activity.applyTheme()
             }
 
             hyphenate.apply {
-                isChecked = currentTheme.hyphenate
+                isChecked = activity.hyphenate
                 setOnCheckedChangeListener { _, isChecked ->
-                    currentTheme.hyphenate = isChecked
-                    listener.onThemeChange(currentTheme)
+                    activity.hyphenate = isChecked
+                    activity.applyTheme()
                 }
             }
 
             paginate.apply {
-                isChecked = currentTheme.flow == ReaderFlow.PAGINATED
+                isChecked = activity.currentTheme.flow == ReaderFlow.PAGINATED
                 setOnCheckedChangeListener { _, isChecked ->
-                    currentTheme.flow = if (isChecked) ReaderFlow.PAGINATED else ReaderFlow.SCROLLED
-                    listener.onThemeChange(currentTheme)
+                    activity.flow = if (isChecked) ReaderFlow.PAGINATED else ReaderFlow.SCROLLED
+                    activity.applyTheme()
+                }
+            }
+
+            useDark.apply {
+                isChecked = activity.useDark
+                setOnCheckedChangeListener { _, isChecked ->
+                    activity.useDark = isChecked
+                    activity.applyTheme()
+                    binding.themes.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -82,8 +83,8 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
         RecyclerView.ViewHolder(itemBinding.root) {
         @SuppressLint("NotifyDataSetChanged")
         fun bind(themeItem: ReaderTheme) {
-            val isSelected = themeItem == currentTheme
-            val isDark = themeItem.useDark
+            val isSelected = themeItem == activity.currentTheme
+            val isDark = activity.useDark
             val bg = if (isDark) themeItem.darkBg else themeItem.lightBg
             val fg = if (isDark) themeItem.darkFg else themeItem.lightFg
 
@@ -100,8 +101,8 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
                     }
 
                     setOnClickListener {
-                        currentTheme = themeItem
-                        listener.onThemeChange(currentTheme)
+                        activity.currentTheme = themeItem
+                        activity.applyTheme()
                         binding.themes.adapter?.notifyDataSetChanged()
                     }
                 }
@@ -123,36 +124,17 @@ class ThemeBottomSheet : BottomSheetDialogFragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val themeItem = themes[position]
+            val themeItem = activity.themes[position]
             holder.bind(themeItem)
         }
 
-        override fun getItemCount(): Int = themes.size
+        override fun getItemCount(): Int = activity.themes.size
     }
 
 
     companion object {
         const val TAG = "ThemeBottomSheet"
 
-        fun roundToStep(value: Float, rangeStart: Float, rangeEnd: Float, stepSize: Float): Float {
-            val roundedValue = (value / stepSize).roundToInt() * stepSize
-            return when {
-                roundedValue < rangeStart -> rangeStart
-                roundedValue > rangeEnd -> rangeEnd
-                else -> roundedValue
-            }
-        }
-
-        fun newInstance(
-            themes: List<ReaderTheme>,
-            currentTheme: ReaderTheme,
-            listener: ThemeChangeListener
-        ): ThemeBottomSheet {
-            return ThemeBottomSheet().apply {
-                this.themes = themes
-                this.currentTheme = currentTheme
-                this.listener = listener
-            }
-        }
+        fun newInstance(): ThemeBottomSheet = ThemeBottomSheet()
     }
 }
