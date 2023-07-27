@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
@@ -58,6 +59,7 @@ class EbookReaderView : WebView {
     private fun setupWebViewSettings() {
         val settings = this.settings
         settings.javaScriptEnabled = true
+        settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         setBackgroundColor(Color.TRANSPARENT)
 
         val assetLoader = WebViewAssetLoader.Builder()
