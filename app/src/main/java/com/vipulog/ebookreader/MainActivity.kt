@@ -31,6 +31,11 @@ class MainActivity : AppCompatActivity() {
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             openFileLauncher.launch(intent)
         }
+
+        binding.openUrl.setOnClickListener {
+            val tag = OpenBookFromUrlBottomSheet.TAG
+            OpenBookFromUrlBottomSheet.newInstance().show(supportFragmentManager, tag)
+        }
     }
 
     private val openFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
