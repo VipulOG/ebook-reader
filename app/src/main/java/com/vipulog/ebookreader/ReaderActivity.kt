@@ -15,6 +15,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import com.vipulog.ebookreader.databinding.ActivityReaderBinding
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 
 private val oceanicBreezeTheme = ReaderTheme(
@@ -77,6 +78,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         setContentView(binding.root)
 
         setupUI()
+        openBook()
     }
 
 
@@ -91,8 +93,37 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     }
 
 
+    private fun openBook() {
+        val uri = intent.data!!
+        val isLocal = uri.scheme == "content"
+        var options = ""
+
+        if (!isLocal) {
+            val method = intent.getStringExtra("method")
+            val headers = intent.getParcelableArrayListExtra<Header>("headers")
+            val headersJson = JSONObject()
+
+            if (headers != null) {
+                for (header in headers) {
+                    headersJson.put(header.key, header.value)
+                }
+            }
+
+            options = """
+                {
+                    method: "$method",
+                    headers: $headersJson,
+                }
+            """.trimIndent()
+        }
+
+        scope.launch {
+            binding.ebookReader.openBook(uri, options)
+        }
+    }
+
+
     private fun setupOptions() {
-        scope.launch { binding.ebookReader.openBook(intent.data!!) }
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.toc -> {
@@ -106,7 +137,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
                 }
 
                 R.id.theme -> {
-                    ThemeBottomSheet.newInstance().show(supportFragmentManager, ThemeBottomSheet.TAG)
+                    ThemeBottomSheet.newInstance()
+                        .show(supportFragmentManager, ThemeBottomSheet.TAG)
                     true
                 }
 
