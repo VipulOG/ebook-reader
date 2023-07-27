@@ -29,6 +29,8 @@ class EbookReaderView : WebView {
     private var listener: EbookReaderEventListener? = null
     private val scope = CoroutineScope(Main)
 
+    private var options = ""
+
 
     constructor(context: Context) : super(context) {
         init()
@@ -78,7 +80,8 @@ class EbookReaderView : WebView {
     }
 
 
-    suspend fun openBook(uri: Uri) {
+    suspend fun openBook(uri: Uri, options: String = "") {
+        this.options = options
         val isOffline = uri.scheme == "content"
         var url = uri.toString()
 
@@ -155,6 +158,15 @@ class EbookReaderView : WebView {
 
     private inner class JavaScriptInterface {
         private val json = Json { ignoreUnknownKeys = true }
+
+
+        @JavascriptInterface
+        fun onApiLoaded() {
+            scope.launch {
+                processJavascript("openReader($options)")
+            }
+        }
+
 
         @JavascriptInterface
         fun onBookLoaded(bookJson: String) {
