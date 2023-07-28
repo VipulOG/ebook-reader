@@ -162,8 +162,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     }
 
 
-    override fun onBookLoadFailed(error: String) {
-        showToast("Error: $error")
+    override fun onBookLoadFailed(error: ReaderError) {
+        error.message?.let { showToast(it) }
         finish()
     }
 

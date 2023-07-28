@@ -180,7 +180,7 @@ class EbookReaderView : WebView {
         @JavascriptInterface
         fun onBookLoadFailed(error: String) {
             scope.launch {
-                listener?.onBookLoadFailed(error)
+                listener?.onBookLoadFailed(Json.decodeFromString(error))
             }
         }
 
