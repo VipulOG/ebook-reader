@@ -156,6 +156,15 @@ class EbookReaderView : WebView {
     private inner class JavaScriptInterface {
         private val json = Json { ignoreUnknownKeys = true }
 
+
+        @JavascriptInterface
+        fun onApiLoaded() {
+            scope.launch {
+                processJavascript("openReader()")
+            }
+        }
+
+
         @JavascriptInterface
         fun onBookLoaded(bookJson: String) {
             scope.launch {
