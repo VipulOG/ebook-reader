@@ -154,7 +154,7 @@ class EbookReaderView : WebView {
 
 
     private inner class JavaScriptInterface {
-        private val json = Json { ignoreUnknownKeys = true }
+        private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
 
         @JavascriptInterface
