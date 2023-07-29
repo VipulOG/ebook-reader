@@ -179,9 +179,10 @@ class EbookReaderView : WebView {
         fun onRelocated(relocationInfoJson: String) {
             scope.launch {
                 val relocationInfo: RelocationInfo = json.decodeFromString(relocationInfoJson)
+                val cfi = relocationInfo.cfi
                 val currentTocItem = relocationInfo.tocItem
                 val fraction = relocationInfo.fraction
-                listener?.onProgressChanged(fraction, currentTocItem)
+                listener?.onProgressChanged(cfi, fraction, currentTocItem)
             }
         }
 

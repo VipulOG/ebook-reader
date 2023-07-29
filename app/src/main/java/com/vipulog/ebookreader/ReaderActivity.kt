@@ -55,6 +55,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     private var actionMode: ActionMode? = null
     private val scope = lifecycleScope
 
+    lateinit var bookId: String
     var currentTocItem: TocItem? = null
     lateinit var toc: List<TocItem>
 
@@ -127,6 +128,10 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         }
 
         toc = bookMetaData.toc
+        bookId = bookMetaData.identifier!!
+
+        val cfi = loadData<String>("${bookMetaData.identifier}_progress", baseContext)
+        cfi?.let {binding.ebookReader.goto(it)        }
     }
 
 
@@ -136,10 +141,11 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     }
 
 
-    override fun onProgressChanged(progress: Double, currentTocItem: TocItem?) {
+    override fun onProgressChanged(cfi: String, progress: Double, currentTocItem: TocItem?) {
         this.currentTocItem = currentTocItem
         binding.progressBar.progress = (progress * 100).toInt()
         binding.appBar.title = currentTocItem?.label ?: ""
+        saveData("${bookId}_progress", cfi, baseContext)
     }
 
 
