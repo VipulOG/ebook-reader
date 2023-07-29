@@ -17,39 +17,6 @@ import com.vipulog.ebookreader.databinding.ActivityReaderBinding
 import kotlinx.coroutines.launch
 
 
-private val oceanicBreezeTheme = ReaderTheme(
-    name = "oceanicBreeze",
-    lightBg = Color.parseColor("#e6f9ff"),
-    lightFg = Color.parseColor("#2c3e50"),
-    darkBg = Color.parseColor("#34495e"),
-    darkFg = Color.parseColor("#ecf0f1"),
-    lightLink = Color.parseColor("#3498db"),
-    darkLink = Color.parseColor("#5dade2"),
-)
-
-
-private val enchantedForestTheme = ReaderTheme(
-    name = "enchantedForest",
-    lightBg = Color.parseColor("#f5f5f5"),
-    lightFg = Color.parseColor("#303030"),
-    darkBg = Color.parseColor("#1a1a1a"),
-    darkFg = Color.parseColor("#f5f5f5"),
-    lightLink = Color.parseColor("#8fbc8f"),
-    darkLink = Color.parseColor("#7cfc00"),
-)
-
-
-private val sepiaTheme = ReaderTheme(
-    name = "sepia",
-    lightBg = Color.parseColor("#f1e8d0"),
-    lightFg = Color.parseColor("#5b4636"),
-    darkBg = Color.parseColor("#342e25"),
-    darkFg = Color.parseColor("#ffd595"),
-    lightLink = Color.parseColor("#008b8b"),
-    darkLink = Color.parseColor("#48d1cc"),
-)
-
-
 class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode.Callback {
     private lateinit var binding: ActivityReaderBinding
     private var actionMode: ActionMode? = null
@@ -60,16 +27,53 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     lateinit var toc: List<TocItem>
 
     lateinit var currentTheme: ReaderTheme
-    val themes = UniqueList<ReaderTheme>().apply {
-        add(oceanicBreezeTheme)
-        add(enchantedForestTheme)
-        add(sepiaTheme)
-    }
+    val themes = arrayListOf<ReaderTheme>()
 
     var flow = ReaderFlow.PAGINATED
     var hyphenate = true
     var justify = true
     var useDark = false
+
+
+    init {
+        val oceanicBreezeTheme = ReaderTheme(
+            name = "oceanicBreeze",
+            lightBg = Color.parseColor("#e6f9ff"),
+            lightFg = Color.parseColor("#2c3e50"),
+            darkBg = Color.parseColor("#34495e"),
+            darkFg = Color.parseColor("#ecf0f1"),
+            lightLink = Color.parseColor("#3498db"),
+            darkLink = Color.parseColor("#5dade2"),
+        )
+
+
+        val enchantedForestTheme = ReaderTheme(
+            name = "enchantedForest",
+            lightBg = Color.parseColor("#f5f5f5"),
+            lightFg = Color.parseColor("#303030"),
+            darkBg = Color.parseColor("#1a1a1a"),
+            darkFg = Color.parseColor("#f5f5f5"),
+            lightLink = Color.parseColor("#8fbc8f"),
+            darkLink = Color.parseColor("#7cfc00"),
+        )
+
+
+        val sepiaTheme = ReaderTheme(
+            name = "sepia",
+            lightBg = Color.parseColor("#f1e8d0"),
+            lightFg = Color.parseColor("#5b4636"),
+            darkBg = Color.parseColor("#342e25"),
+            darkFg = Color.parseColor("#ffd595"),
+            lightLink = Color.parseColor("#008b8b"),
+            darkLink = Color.parseColor("#48d1cc"),
+        )
+
+        themes.apply {
+            add(oceanicBreezeTheme)
+            add(enchantedForestTheme)
+            add(sepiaTheme)
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
