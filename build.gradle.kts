@@ -1,6 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-val libVersion by extra { "0.1.2" }
+val libVersion by extra { "0.1.3" }
 
 plugins {
     val kotlinVersion = "1.8.22"
