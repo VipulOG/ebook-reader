@@ -8,7 +8,6 @@ import android.util.AttributeSet
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
-import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
@@ -29,8 +28,6 @@ class EbookReaderView : WebView {
     private val fileServer: FileServer = FileServer()
     private var listener: EbookReaderEventListener? = null
     private val scope = CoroutineScope(Main)
-
-    private var options = ""
 
 
     constructor(context: Context) : super(context) {
@@ -59,7 +56,6 @@ class EbookReaderView : WebView {
     private fun setupWebViewSettings() {
         val settings = this.settings
         settings.javaScriptEnabled = true
-        settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         setBackgroundColor(Color.TRANSPARENT)
 
         val assetLoader = WebViewAssetLoader.Builder()
@@ -82,8 +78,7 @@ class EbookReaderView : WebView {
     }
 
 
-    suspend fun openBook(uri: Uri, options: String = "") {
-        this.options = options
+    suspend fun openBook(uri: Uri) {
         val isOffline = uri.scheme == "content"
         var url = uri.toString()
 
@@ -160,15 +155,6 @@ class EbookReaderView : WebView {
 
     private inner class JavaScriptInterface {
         private val json = Json { ignoreUnknownKeys = true }
-
-
-        @JavascriptInterface
-        fun onApiLoaded() {
-            scope.launch {
-                processJavascript("openReader($options)")
-            }
-        }
-
 
         @JavascriptInterface
         fun onBookLoaded(bookJson: String) {

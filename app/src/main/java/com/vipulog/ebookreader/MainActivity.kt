@@ -3,13 +3,12 @@ package com.vipulog.ebookreader
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.vipulog.ebookreader.databinding.ActivityMainBinding
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
     private lateinit var binding: ActivityMainBinding
+    private val pickEbookFileRequestCode: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,34 +18,27 @@ class MainActivity : AppCompatActivity() {
         binding.openFile.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
-            intent.putExtra(
-                Intent.EXTRA_MIME_TYPES, arrayOf(
-                    "application/epub+zip",
-                    "application/x-mobipocket-ebook",
-                    "application/vnd.amazon.ebook",
-                    "application/fb2+zip",
-                    "application/vnd.comicbook+zip"
-                )
-            )
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                "application/epub+zip",
+                "application/x-mobipocket-ebook",
+                "application/vnd.amazon.ebook",
+                "application/fb2+zip",
+                "application/vnd.comicbook+zip"
+            ))
             intent.addCategory(Intent.CATEGORY_OPENABLE)
-            openFileLauncher.launch(intent)
-        }
-
-        binding.openUrl.setOnClickListener {
-            val tag = OpenBookFromUrlBottomSheet.TAG
-            OpenBookFromUrlBottomSheet.newInstance().show(supportFragmentManager, tag)
+            startActivityForResult(intent, pickEbookFileRequestCode)
         }
     }
 
-    private val openFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = it.data
-                if (data != null && data.data != null) {
-                    val uri = data.data
-                    val intent = Intent(this, ReaderActivity::class.java)
-                    intent.data = uri
-                    startActivity(intent)
-                }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == pickEbookFileRequestCode && resultCode == RESULT_OK) {
+            if (data != null && data.data != null) {
+                val uri = data.data
+                val intent = Intent(this, ReaderActivity::class.java)
+                intent.data = uri
+                startActivity(intent)
             }
         }
+    }
 }
