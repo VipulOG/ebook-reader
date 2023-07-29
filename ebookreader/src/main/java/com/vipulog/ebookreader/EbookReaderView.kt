@@ -79,15 +79,12 @@ class EbookReaderView : WebView {
 
 
     suspend fun openBook(uri: Uri) {
-        val isOffline = uri.scheme == "content"
-        var url = uri.toString()
+        val fileName = "book.epub"
+        val outputFile = File("${context.cacheDir}/ebookreader", fileName)
+        val url = outputFile.toURI().toString()
 
-        if (isOffline) withContext(IO) {
-            val fileName = "book.epub"
-            val outputFile = File("${context.cacheDir}/ebookreader", fileName)
-            url = outputFile.toURI().toString()
-
-            if (!outputFile.exists()) outputFile.parentFile?.mkdirs()
+        if (!outputFile.exists()) outputFile.parentFile?.mkdirs()
+         withContext(IO) {
             context.contentResolver.openInputStream(uri)?.use { input ->
                 FileOutputStream(outputFile).use { output ->
                     val buffer = ByteArray(1024)
@@ -101,8 +98,7 @@ class EbookReaderView : WebView {
         }
 
         val readerUrl = "https://appassets.androidplatform.net/assets/ebook-reader/reader.html"
-        val bookUrl =
-            if (isOffline) "http://localhost:${fileServer.listeningPort}/?url=$url" else url
+        val bookUrl = "http://localhost:${fileServer.listeningPort}/?url=$url"
         val uriBuilder = Uri.parse(readerUrl).buildUpon().appendQueryParameter("url", bookUrl)
         val bookReaderUrl = uriBuilder.build().toString()
         loadUrl(bookReaderUrl)
