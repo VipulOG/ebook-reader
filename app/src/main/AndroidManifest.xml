@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.vipulog.ebookreader.EbookReaderDemoApplication"
+        android:name=".EbookReaderDemoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -13,7 +13,7 @@
         android:theme="@style/Theme.App">
 
         <activity
-            android:name="com.vipulog.ebookreader.ReaderActivity"
+            android:name=".ReaderActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true">
             <intent-filter>
@@ -39,7 +39,7 @@
         </activity>
 
         <activity
-            android:name="com.vipulog.ebookreader.MainActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
