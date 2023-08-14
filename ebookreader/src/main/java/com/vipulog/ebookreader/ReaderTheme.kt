@@ -9,7 +9,6 @@ data class ReaderTheme(
     var lineHeight: Float = 1.4f,
     var justify: Boolean = true,
     var hyphenate: Boolean = true,
-    var invert: Boolean = false,
     @SerialName("themeName")
     val name: String,
     @Serializable(with = ColorSerializer::class)
