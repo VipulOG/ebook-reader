@@ -41,6 +41,7 @@ dependencies {
     implementation("androidx.webkit:webkit:1.7.0")
 
     implementation("org.nanohttpd:nanohttpd:2.3.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 }
 
 val libVersion: String by rootProject.extra

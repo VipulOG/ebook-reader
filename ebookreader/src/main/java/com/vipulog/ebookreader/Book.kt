@@ -14,13 +14,12 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 @Serializable
-data class BookMetaData(
+data class Book(
     val title: String? = null,
     val subtitle: String? = null,
     @Serializable(with = NameSerializer::class)
     val author: List<String>?,
     val description: String? = null,
-    val cover: String? = null,
     val identifier: String? = null,
     val language: List<String>? = null,
     val publisher: String? = null,

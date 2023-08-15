@@ -25,7 +25,8 @@ import java.io.FileOutputStream
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class EbookReaderView : WebView {
+class EbookReaderView : ConstraintLayout {
+    private val webView: WebView
     private val fileServer: FileServer = FileServer()
     private var listener: EbookReaderEventListener? = null
     private val scope = CoroutineScope(Main)
@@ -35,18 +36,22 @@ class EbookReaderView : WebView {
 
 
     constructor(context: Context) : super(context) {
+        webView = WebView(context)
         init()
     }
 
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        webView = WebView(context, attrs)
         init()
     }
 
 
     private fun init() {
+        webView.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        addView(webView)
         setupWebViewSettings()
-        addJavascriptInterface(JavaScriptInterface(), "AndroidInterface")
+        webView.addJavascriptInterface(JavaScriptInterface(), "AndroidInterface")
     }
 
 
@@ -58,7 +63,7 @@ class EbookReaderView : WebView {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebViewSettings() {
-        val settings = this.settings
+        val settings = webView.settings
         settings.javaScriptEnabled = true
         setBackgroundColor(Color.TRANSPARENT)
 
@@ -66,7 +71,7 @@ class EbookReaderView : WebView {
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
             .build()
 
-        webViewClient = object : WebViewClientCompat() {
+        webView.webViewClient = object : WebViewClientCompat() {
             override fun shouldOverrideUrlLoading(
                 view: WebView,
                 request: WebResourceRequest
@@ -118,7 +123,7 @@ class EbookReaderView : WebView {
         val bookUrl = "http://localhost:${fileServer.listeningPort}/?url=$url"
         val uriBuilder = Uri.parse(readerUrl).buildUpon().appendQueryParameter("url", bookUrl)
         val bookReaderUrl = uriBuilder.build().toString()
-        loadUrl(bookReaderUrl)
+        webView.loadUrl(bookReaderUrl)
     }
 
 
@@ -157,7 +162,7 @@ class EbookReaderView : WebView {
 
 
     private fun processJavascript(script: String, callback: ((String) -> Unit)? = null) {
-        evaluateJavascript(script) {
+        webView.evaluateJavascript(script) {
             val pattern = "^\"(.*)\"$".toRegex()
             val matchResult = pattern.find(it)
             val out = matchResult?.groupValues?.get(1) ?: it
@@ -168,15 +173,6 @@ class EbookReaderView : WebView {
 
     private inner class JavaScriptInterface {
         private val json = Json { ignoreUnknownKeys = true; isLenient = true }
-
-
-        @JavascriptInterface
-        fun onApiLoaded() {
-            scope.launch {
-                processJavascript("openReader()")
-            }
-        }
-
 
         @JavascriptInterface
         fun onBookLoaded(bookJson: String) {

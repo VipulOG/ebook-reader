@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
@@ -82,6 +83,9 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         setContentView(binding.root)
 
         setupUI()
+        setupBackPressedHandler()
+
+        scope.launch { binding.ebookReader.openBook(intent.data!!) }
     }
 
 
@@ -92,12 +96,6 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         binding.nextChapter.setOnClickListener { binding.ebookReader.next() }
         binding.prevChapter.setOnClickListener { binding.ebookReader.prev() }
 
-        setupOptions()
-    }
-
-
-    private fun setupOptions() {
-        scope.launch { binding.ebookReader.openBook(intent.data!!) }
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.toc -> {
@@ -111,7 +109,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
                 }
 
                 R.id.theme -> {
-                    ThemeBottomSheet.newInstance().show(supportFragmentManager, ThemeBottomSheet.TAG)
+                    ThemeBottomSheet.newInstance()
+                        .show(supportFragmentManager, ThemeBottomSheet.TAG)
                     true
                 }
 
@@ -121,17 +120,38 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     }
 
 
-    override fun onBookLoaded(bookMetaData: BookMetaData) {
-        toc = bookMetaData.toc
-        val bookId = bookMetaData.identifier!!
+    private fun setupBackPressedHandler() {
+        var lastBackPressedTime: Long = 0
+        val doublePressInterval: Long = 2000
+
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (lastBackPressedTime + doublePressInterval > System.currentTimeMillis()) {
+                    finish()
+                } else {
+                    Toast.makeText(
+                        this@ReaderActivity,
+                        "Press back again to exit",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    lastBackPressedTime = System.currentTimeMillis()
+                }
+            }
+        })
+    }
+
+
+    override fun onBookLoaded(book: Book) {
+        toc = book.toc
+        val bookId = book.identifier!!
 
         val illegalCharsRegex = Regex("[^a-zA-Z0-9._-]")
-        sanitizedBookId  = bookId.replace(illegalCharsRegex, "_")
+        sanitizedBookId = bookId.replace(illegalCharsRegex, "_")
 
         val cfi = loadData<String>("${sanitizedBookId}_progress", baseContext)
         cfi?.let { binding.ebookReader.goto(it) }
 
-        binding.appBar.subtitle = bookMetaData.subtitle ?: bookMetaData.title
+        binding.appBar.subtitle = book.subtitle ?: book.title
         binding.appBar.menu.setGroupVisible(R.id.bookOptions, true)
 
         binding.ebookReader.getAppearance {
