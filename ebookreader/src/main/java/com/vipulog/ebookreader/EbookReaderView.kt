@@ -2,6 +2,7 @@ package com.vipulog.ebookreader
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.util.AttributeSet
@@ -28,6 +29,9 @@ class EbookReaderView : WebView {
     private val fileServer: FileServer = FileServer()
     private var listener: EbookReaderEventListener? = null
     private val scope = CoroutineScope(Main)
+
+    private val domain = "appassets.androidplatform.net"
+    private val readerUrl = "https://$domain/assets/ebook-reader/reader.html"
 
 
     constructor(context: Context) : super(context) {
@@ -63,6 +67,20 @@ class EbookReaderView : WebView {
             .build()
 
         webViewClient = object : WebViewClientCompat() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest
+            ): Boolean {
+                val url = request.url
+                val sanitizedUrl = Uri.parse(url.toString().replace("blob:", ""))
+                if (!sanitizedUrl.host.equals(domain, ignoreCase = true)) {
+                    val intent = Intent(Intent.ACTION_VIEW, url)
+                    view.context.startActivity(intent)
+                    return true
+                }
+                return super.shouldOverrideUrlLoading(view, request)
+            }
+
             override fun shouldInterceptRequest(
                 view: WebView?,
                 request: WebResourceRequest
@@ -84,7 +102,7 @@ class EbookReaderView : WebView {
         val url = outputFile.toURI().toString()
 
         if (!outputFile.exists()) outputFile.parentFile?.mkdirs()
-         withContext(IO) {
+        withContext(IO) {
             context.contentResolver.openInputStream(uri)?.use { input ->
                 FileOutputStream(outputFile).use { output ->
                     val buffer = ByteArray(1024)
@@ -97,7 +115,6 @@ class EbookReaderView : WebView {
             }
         }
 
-        val readerUrl = "https://appassets.androidplatform.net/assets/ebook-reader/reader.html"
         val bookUrl = "http://localhost:${fileServer.listeningPort}/?url=$url"
         val uriBuilder = Uri.parse(readerUrl).buildUpon().appendQueryParameter("url", bookUrl)
         val bookReaderUrl = uriBuilder.build().toString()
