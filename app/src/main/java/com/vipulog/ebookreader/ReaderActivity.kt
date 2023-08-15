@@ -4,7 +4,9 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
@@ -15,7 +17,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import com.vipulog.ebookreader.databinding.ActivityReaderBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 
 class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode.Callback {
@@ -183,6 +189,27 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
 
     override fun onTextSelectionModeChange(mode: Boolean) {
         if (mode) startSupportActionMode(this) else actionMode?.finish()
+    }
+
+
+    override fun onImageSelected(base64String: String) {
+        scope.launch(Dispatchers.IO) {
+            val base64Data = base64String.substringAfter(",")
+            val imageBytes: ByteArray = Base64.decode(base64Data, Base64.DEFAULT)
+            val imageFile = File(cacheDir, "image.jpg")
+
+            if (imageFile.exists()) imageFile.delete()
+
+            try {
+                FileOutputStream(imageFile).use { outputStream -> outputStream.write(imageBytes) }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+            val intent = Intent(this@ReaderActivity, ImagePreviewActivity::class.java)
+            intent.data = Uri.fromFile(imageFile)
+            startActivity(intent)
+        }
     }
 
 

@@ -11,7 +11,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import android.webkit.WebView.HitTestResult
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat.startActivity
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
 import kotlinx.coroutines.CoroutineScope
@@ -52,10 +54,8 @@ class EbookReaderView : ConstraintLayout {
 
 
     private fun init() {
-        webView.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
         addView(webView)
         setupWebViewSettings()
-        webView.addJavascriptInterface(JavaScriptInterface(), "AndroidInterface")
     }
 
 
@@ -67,6 +67,8 @@ class EbookReaderView : ConstraintLayout {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebViewSettings() {
+        webView.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
+
         val settings = webView.settings
         settings.javaScriptEnabled = true
         setBackgroundColor(Color.TRANSPARENT)
@@ -95,6 +97,21 @@ class EbookReaderView : ConstraintLayout {
                 request: WebResourceRequest
             ): WebResourceResponse? {
                 return assetLoader.shouldInterceptRequest(request.url)
+            }
+        }
+
+        webView.addJavascriptInterface(JavaScriptInterface(), "AndroidInterface")
+
+        webView.setOnLongClickListener {
+            val result = webView.hitTestResult
+            if (result.type == HitTestResult.IMAGE_TYPE) {
+                val imageUrl = result.extra
+                processJavascript(
+                    "getBlobAsBase64('$imageUrl', (res) => { AndroidInterface.onImageSelected(res) })"
+                )
+                return@setOnLongClickListener true
+            } else {
+                return@setOnLongClickListener false
             }
         }
     }
@@ -223,6 +240,13 @@ class EbookReaderView : ConstraintLayout {
                 val fraction = relocationInfo.fraction
                 navigationStack.add(cfi)
                 listener?.onProgressChanged(cfi, fraction, currentTocItem)
+            }
+        }
+
+        @JavascriptInterface
+        fun onImageSelected(imageBase64: String) {
+            scope.launch {
+                listener?.onImageSelected(imageBase64)
             }
         }
 

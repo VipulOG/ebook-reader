@@ -53,4 +53,6 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     implementation("com.mikhaellopez:circleview:1.4.1")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
 }
