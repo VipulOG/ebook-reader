@@ -20,14 +20,6 @@
         app:showAsAction="ifRoom"
         tools:ignore="HardcodedText" />
     <item
-        android:id="@+id/readAloud"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:icon="@drawable/round_volume_up_24"
-        android:title="Read Aloud"
-        app:showAsAction="ifRoom"
-        tools:ignore="HardcodedText" />
-    <item
         android:id="@+id/copy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

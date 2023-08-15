@@ -111,11 +111,6 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
                     true
                 }
 
-                R.id.readAloud -> {
-                    showToast("TODO: Read Aloud")
-                    true
-                }
-
                 R.id.theme -> {
                     ThemeBottomSheet.newInstance()
                         .show(supportFragmentManager, ThemeBottomSheet.TAG)
@@ -236,11 +231,6 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         return when (item?.itemId) {
             R.id.format -> {
                 showToast("TODO: Format")
-                true
-            }
-
-            R.id.readAloud -> {
-                showToast("TODO: Read Aloud")
                 true
             }
 
