@@ -1,5 +1,6 @@
 package com.vipulog.ebookreader
 
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -176,11 +177,13 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     }
 
 
-    override fun onProgressChanged(cfi: String, progress: Double, currentTocItem: TocItem?) {
-        this.currentTocItem = currentTocItem
-        binding.progressBar.progress = (progress * 100).toInt()
+    @SuppressLint("SetTextI18n")
+    override fun onProgressChanged(info: RelocationInfo) {
+        this.currentTocItem = info.tocItem
+        binding.pageNo.text = "${info.currentLocation}/${info.totalLocations}"
+        binding.progressBar.progress = (info.fraction * 100).toInt()
         binding.appBar.title = currentTocItem?.label ?: ""
-        saveData("${sanitizedBookId}_progress", cfi, baseContext)
+        saveData("${sanitizedBookId}_progress", info.cfi, baseContext)
     }
 
 

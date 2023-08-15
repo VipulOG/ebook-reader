@@ -235,11 +235,8 @@ class EbookReaderView : ConstraintLayout {
         fun onRelocated(relocationInfoJson: String) {
             scope.launch {
                 val relocationInfo: RelocationInfo = json.decodeFromString(relocationInfoJson)
-                val cfi = relocationInfo.cfi
-                val currentTocItem = relocationInfo.tocItem
-                val fraction = relocationInfo.fraction
-                navigationStack.add(cfi)
-                listener?.onProgressChanged(cfi, fraction, currentTocItem)
+                navigationStack.add(relocationInfo.cfi)
+                listener?.onProgressChanged(relocationInfo)
             }
         }
 
