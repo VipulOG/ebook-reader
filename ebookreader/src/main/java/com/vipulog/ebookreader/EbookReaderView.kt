@@ -6,10 +6,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.util.AttributeSet
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +35,8 @@ class EbookReaderView : ConstraintLayout {
 
     private val domain = "appassets.androidplatform.net"
     private val readerUrl = "https://$domain/assets/ebook-reader/reader.html"
+
+    private val navigationStack = ArrayDeque<String>()
 
 
     constructor(context: Context) : super(context) {
@@ -147,6 +151,28 @@ class EbookReaderView : ConstraintLayout {
     }
 
 
+    fun canGoBack(): Boolean {
+        return navigationStack.size > 1
+    }
+
+
+    fun goBack() {
+        if (canGoBack()) {
+            navigationStack.removeLast()
+            val cfi = navigationStack.last()
+            processJavascript("goto('$cfi')")
+            navigationStack.removeLast()
+        }
+    }
+
+
+    fun goBackMultiple(steps: Int) {
+        repeat(steps) {
+            goBack()
+        }
+    }
+
+
     fun getAppearance(callback: (ReaderTheme) -> Unit) {
         processJavascript("getAppearance()") {
             callback(Json.decodeFromString(it))
@@ -195,6 +221,7 @@ class EbookReaderView : ConstraintLayout {
                 val cfi = relocationInfo.cfi
                 val currentTocItem = relocationInfo.tocItem
                 val fraction = relocationInfo.fraction
+                navigationStack.add(cfi)
                 listener?.onProgressChanged(cfi, fraction, currentTocItem)
             }
         }

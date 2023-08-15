@@ -126,15 +126,19 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
 
         onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (lastBackPressedTime + doublePressInterval > System.currentTimeMillis()) {
-                    finish()
+                if (binding.ebookReader.canGoBack()) {
+                    binding.ebookReader.goBack()
                 } else {
-                    Toast.makeText(
-                        this@ReaderActivity,
-                        "Press back again to exit",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    lastBackPressedTime = System.currentTimeMillis()
+                    if (lastBackPressedTime + doublePressInterval > System.currentTimeMillis()) {
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this@ReaderActivity,
+                            "Press back again to exit",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        lastBackPressedTime = System.currentTimeMillis()
+                    }
                 }
             }
         })
