@@ -13,6 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:menu="@menu/app_bar_menu"
+            app:navigationIcon="?attr/homeAsUpIndicator"
             tools:subtitle="Book Title"
             tools:title="Chapter Title" />
 

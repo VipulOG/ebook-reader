@@ -96,7 +96,9 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
 
 
     private fun setupUI() {
-        binding.appBar.menu.setGroupVisible(R.id.bookOptions, false)
+        binding.appBar.setNavigationOnClickListener {
+            finish()
+        }
 
         binding.ebookReader.setEbookReaderListener(this)
         binding.nextChapter.setOnClickListener { binding.ebookReader.next() }
