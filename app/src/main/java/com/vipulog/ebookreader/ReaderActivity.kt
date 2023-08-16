@@ -115,15 +115,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         val gestureDetector =
             GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                    if (controlsVisible) {
-                        binding.topControls.y -= binding.topControls.height.toFloat()
-                        binding.bottomControls.y += binding.bottomControls.height.toFloat()
-                        controlsVisible = false
-                    } else {
-                        binding.topControls.y += binding.topControls.height.toFloat()
-                        binding.bottomControls.y -= binding.bottomControls.height.toFloat()
-                        controlsVisible = true
-                    }
+                    toggleControlsVisibility()
                     return super.onSingleTapConfirmed(e)
                 }
             })
@@ -276,6 +268,25 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
 
             else -> false
         }
+    }
+
+
+    private fun toggleControlsVisibility() {
+        val topControlsAnimator = binding.topControls.animate()
+        val bottomControlsAnimator = binding.bottomControls.animate()
+
+        controlsVisible = if (controlsVisible) {
+            topControlsAnimator.translationYBy(-binding.topControls.height.toFloat())
+            bottomControlsAnimator.translationYBy(binding.bottomControls.height.toFloat())
+            false
+        } else {
+            topControlsAnimator.translationYBy(binding.topControls.height.toFloat())
+            bottomControlsAnimator.translationYBy(-binding.bottomControls.height.toFloat())
+            true
+        }
+
+        topControlsAnimator.start()
+        bottomControlsAnimator.start()
     }
 
 
