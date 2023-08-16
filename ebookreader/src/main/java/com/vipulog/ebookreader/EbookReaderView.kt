@@ -6,14 +6,10 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.util.AttributeSet
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import android.webkit.WebView.HitTestResult
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.startActivity
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
 import kotlinx.coroutines.CoroutineScope
@@ -29,8 +25,7 @@ import java.io.FileOutputStream
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class EbookReaderView : ConstraintLayout {
-    private val webView: WebView
+class EbookReaderView : WebView {
     private val fileServer: FileServer = FileServer()
     private var listener: EbookReaderEventListener? = null
     private val scope = CoroutineScope(Main)
@@ -42,19 +37,16 @@ class EbookReaderView : ConstraintLayout {
 
 
     constructor(context: Context) : super(context) {
-        webView = WebView(context)
         init()
     }
 
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        webView = WebView(context, attrs)
         init()
     }
 
 
     private fun init() {
-        addView(webView)
         setupWebViewSettings()
     }
 
@@ -67,9 +59,6 @@ class EbookReaderView : ConstraintLayout {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebViewSettings() {
-        webView.layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
-
-        val settings = webView.settings
         settings.javaScriptEnabled = true
         setBackgroundColor(Color.TRANSPARENT)
 
@@ -77,7 +66,7 @@ class EbookReaderView : ConstraintLayout {
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context))
             .build()
 
-        webView.webViewClient = object : WebViewClientCompat() {
+        webViewClient = object : WebViewClientCompat() {
             override fun shouldOverrideUrlLoading(
                 view: WebView,
                 request: WebResourceRequest
@@ -100,10 +89,10 @@ class EbookReaderView : ConstraintLayout {
             }
         }
 
-        webView.addJavascriptInterface(JavaScriptInterface(), "AndroidInterface")
+        addJavascriptInterface(JavaScriptInterface(), "AndroidInterface")
 
-        webView.setOnLongClickListener {
-            val result = webView.hitTestResult
+        setOnLongClickListener {
+            val result = hitTestResult
             if (result.type == HitTestResult.IMAGE_TYPE) {
                 val imageUrl = result.extra
                 processJavascript(
@@ -144,7 +133,7 @@ class EbookReaderView : ConstraintLayout {
         val bookUrl = "http://localhost:${fileServer.listeningPort}/?url=$url"
         val uriBuilder = Uri.parse(readerUrl).buildUpon().appendQueryParameter("url", bookUrl)
         val bookReaderUrl = uriBuilder.build().toString()
-        webView.loadUrl(bookReaderUrl)
+        loadUrl(bookReaderUrl)
     }
 
 
@@ -168,24 +157,17 @@ class EbookReaderView : ConstraintLayout {
     }
 
 
-    fun canGoBack(): Boolean {
+    override fun canGoBack(): Boolean {
         return navigationStack.size > 1
     }
 
 
-    fun goBack() {
+    override fun goBack() {
         if (canGoBack()) {
             navigationStack.removeLast()
             val cfi = navigationStack.last()
             processJavascript("goto('$cfi')")
             navigationStack.removeLast()
-        }
-    }
-
-
-    fun goBackMultiple(steps: Int) {
-        repeat(steps) {
-            goBack()
         }
     }
 
@@ -205,7 +187,7 @@ class EbookReaderView : ConstraintLayout {
 
 
     private fun processJavascript(script: String, callback: ((String) -> Unit)? = null) {
-        webView.evaluateJavascript(script) {
+        evaluateJavascript(script) {
             val pattern = "^\"(.*)\"$".toRegex()
             val matchResult = pattern.find(it)
             val out = matchResult?.groupValues?.get(1) ?: it
