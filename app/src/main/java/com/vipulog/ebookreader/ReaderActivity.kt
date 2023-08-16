@@ -233,7 +233,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
                 e.printStackTrace()
             }
 
-            val intent = Intent(this@ReaderActivity, ImagePreviewActivity::class.java)
+            val intent = Intent(this@ReaderActivity, ImagePreviewActivity::class.java).setAction(Intent.ACTION_VIEW)
             intent.data = Uri.fromFile(imageFile)
             startActivity(intent)
         }

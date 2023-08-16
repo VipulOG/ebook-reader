@@ -35,7 +35,7 @@ class MainActivity : Activity() {
         if (requestCode == pickEbookFileRequestCode && resultCode == RESULT_OK) {
             if (data != null && data.data != null) {
                 val uri = data.data
-                val intent = Intent(this, ReaderActivity::class.java)
+                val intent = Intent(this, ReaderActivity::class.java).setAction(Intent.ACTION_VIEW)
                 intent.data = uri
                 startActivity(intent)
             }
