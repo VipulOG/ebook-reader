@@ -105,6 +105,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         binding.nextChapter.setOnClickListener { binding.ebookReader.next() }
         binding.prevChapter.setOnClickListener { binding.ebookReader.prev() }
 
+        binding.appBar.menu.setGroupVisible(R.id.bookOptions, false)
+
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.toc -> {
