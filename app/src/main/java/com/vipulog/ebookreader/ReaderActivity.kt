@@ -8,8 +8,10 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
+import android.view.GestureDetector
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
@@ -41,6 +43,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     var hyphenate = true
     var justify = true
     var useDark = false
+
+    var controlsVisible = true
 
 
     init {
@@ -96,6 +100,7 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() {
         binding.appBar.setNavigationOnClickListener {
             finish()
@@ -106,6 +111,26 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         binding.prevChapter.setOnClickListener { binding.ebookReader.prev() }
 
         binding.appBar.menu.setGroupVisible(R.id.bookOptions, false)
+
+        val gestureDetector =
+            GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    if (controlsVisible) {
+                        binding.topControls.y -= binding.topControls.height.toFloat()
+                        binding.bottomControls.y += binding.bottomControls.height.toFloat()
+                        controlsVisible = false
+                    } else {
+                        binding.topControls.y += binding.topControls.height.toFloat()
+                        binding.bottomControls.y -= binding.bottomControls.height.toFloat()
+                        controlsVisible = true
+                    }
+                    return super.onSingleTapConfirmed(e)
+                }
+            })
+
+        binding.ebookReader.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+        }
 
         binding.appBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
