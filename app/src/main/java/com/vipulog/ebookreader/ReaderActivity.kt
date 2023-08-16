@@ -187,6 +187,8 @@ class ReaderActivity : AppCompatActivity(), EbookReaderEventListener, ActionMode
         }
 
         binding.loading.visibility = GONE
+
+        toggleControlsVisibility()
     }
 
 
